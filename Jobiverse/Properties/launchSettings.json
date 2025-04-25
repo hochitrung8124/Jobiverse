@@ -13,8 +13,8 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "launchUrl": "swagger/index.html",
-      "applicationUrl": "http://localhost:5038",
+      "launchUrl": "weatherforecast",
+      "applicationUrl": "http://localhost:5091",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
@@ -23,8 +23,8 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "launchUrl": "swagger/index.html",
-      "applicationUrl": "https://localhost:7155;http://localhost:5038",
+      "launchUrl": "weatherforecast",
+      "applicationUrl": "https://localhost:7056;http://localhost:5091",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
@@ -32,7 +32,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "api/SinhVien",
+      "launchUrl": "weatherforecast",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

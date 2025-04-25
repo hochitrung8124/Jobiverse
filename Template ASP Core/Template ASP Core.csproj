@@ -7,8 +7,4 @@
     <RootNamespace>Template_ASP_Core</RootNamespace>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Entity\Entity.csproj" />
-  </ItemGroup>
-
 </Project>
