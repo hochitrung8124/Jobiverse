@@ -1,4 +1,14 @@
+using Entity.Models;
+using Microsoft.EntityFrameworkCore;
+
+
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<JobiverseContext>(options =>
+            options.UseMySQL(
+                builder.Configuration.GetConnectionString("AivenConnection")
+            )
+        );
+
 
 // Add services to the container.
 
