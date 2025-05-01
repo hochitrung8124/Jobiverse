@@ -1,4 +1,5 @@
-﻿using Entity.Models;
+﻿
+using API.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,7 +19,7 @@ namespace API.Controllers
         [HttpGet]
         public IActionResult GettAll()
         {
-            return Ok(_jobiverseContext.Users.ToList());    
+            return Ok(_jobiverseContext.Users.ToList());
         }
     }
 }
