@@ -6,9 +6,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 // Add services to the container.
-builder.Services.AddDbContext<JobiverseContext>(options =>
+/*builder.Services.AddDbContext<JobiverseContext>(options =>
     options.UseMySQL(builder.Configuration.GetConnectionString("AivenConnection"))
-);
+);*/
 builder.Services.AddControllers();
 
 var app = builder.Build();
