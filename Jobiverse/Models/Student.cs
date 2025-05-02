@@ -19,7 +19,7 @@ public partial class Student
 
     public string? AvatarUrl { get; set; }
 
-    public virtual User Account { get; set; } = null!;
+    public virtual Accounts Account { get; set; } = null!;
 
     public virtual ICollection<Cv> Cvs { get; set; } = new List<Cv>();
 

@@ -25,5 +25,5 @@ public partial class Employer
 
     public string? AddressEmployers { get; set; }
 
-    public virtual User Account { get; set; } = null!;
+    public virtual Accounts Account { get; set; } = null!;
 }

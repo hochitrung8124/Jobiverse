@@ -18,7 +18,7 @@ namespace API.Controllers
         [HttpGet]
         public IActionResult GettAll()
         {
-            return Ok(_jobiverseContext.Users.ToList());
+            return Ok(_jobiverseContext.Accounts.ToList());
         }
     }
 }

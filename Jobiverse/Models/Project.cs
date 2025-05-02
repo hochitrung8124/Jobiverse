@@ -23,7 +23,7 @@ public partial class Project
 
     public DateTime? CreatedAt { get; set; }
 
-    public virtual User Account { get; set; } = null!;
+    public virtual Accounts Account { get; set; } = null!;
 
     public virtual Major? Major { get; set; }
 

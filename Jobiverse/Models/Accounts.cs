@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace API.Models;
 
-public partial class User
+public partial class Accounts
 {
     public string AccountId { get; set; } = null!;
 
