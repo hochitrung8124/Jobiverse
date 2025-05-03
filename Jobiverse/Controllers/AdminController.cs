@@ -16,9 +16,31 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public IActionResult GettAll()
+        public IActionResult GettAllAccount()
         {
             return Ok(_jobiverseContext.Accounts.ToList());
         }
+
+        [HttpDelete("{accountId}")]
+        public IActionResult DeleteAccount(string accountId)
+        {
+            try
+            {
+                var checkId = _jobiverseContext.Accounts.SingleOrDefault(tt => tt.AccountId.Equals(accountId));
+                if (checkId == null) 
+                {
+                    return NoContent();
+                }
+                _jobiverseContext.Remove(checkId);
+                _jobiverseContext.SaveChanges();    
+                return Ok("Delete success!");
+            } catch 
+            {
+                return BadRequest();
+            }
+        }
+
+        ///xem cac project
+        ///
     }
 }
