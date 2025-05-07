@@ -19,7 +19,9 @@ public partial class Student
 
     public string? AvatarUrl { get; set; }
 
-    public virtual Accounts Account { get; set; } = null!;
+    public bool? Deleted { get; set; }
+
+    public virtual Account Account { get; set; } = null!;
 
     public virtual ICollection<Cv> Cvs { get; set; } = new List<Cv>();
 

@@ -11,5 +11,7 @@ public partial class Discipline
 
     public string DisciplineName { get; set; } = null!;
 
+    public bool? Deleted { get; set; }
+
     public virtual Major? Major { get; set; }
 }

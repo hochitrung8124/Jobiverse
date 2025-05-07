@@ -15,5 +15,7 @@ public partial class CvFile
 
     public DateTime? UploadedAt { get; set; }
 
+    public bool? Deleted { get; set; }
+
     public virtual Cv Cv { get; set; } = null!;
 }

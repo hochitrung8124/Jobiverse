@@ -15,6 +15,8 @@ public partial class StudentApply
 
     public DateTime? AppliedAt { get; set; }
 
+    public bool? Deleted { get; set; }
+
     public virtual Project Project { get; set; } = null!;
 
     public virtual Student Student { get; set; } = null!;

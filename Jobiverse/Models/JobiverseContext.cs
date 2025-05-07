@@ -15,6 +15,8 @@ public partial class JobiverseContext : DbContext
     {
     }
 
+    public virtual DbSet<Account> Accounts { get; set; }
+
     public virtual DbSet<Cv> Cvs { get; set; }
 
     public virtual DbSet<CvFile> CvFiles { get; set; }
@@ -33,14 +35,29 @@ public partial class JobiverseContext : DbContext
 
     public virtual DbSet<StudentApply> StudentApplies { get; set; }
 
-    public virtual DbSet<Accounts> Accounts { get; set; }
-
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseMySQL("server=mysql-ed145c2-hochitrung08012004-6685.j.aivencloud.com;port=22012;database=Jobiverse;user=avnadmin;password=AVNS_23e2BqV9YnTCreBLUIT;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Account>(entity =>
+        {
+            entity.HasKey(e => e.AccountId).HasName("PRIMARY");
+
+            entity.HasIndex(e => e.Email, "Email").IsUnique();
+
+            entity.HasIndex(e => e.PhoneNumber, "PhoneNumber").IsUnique();
+
+            entity.Property(e => e.AccountId)
+                .HasDefaultValueSql("'uuid()'")
+                .HasColumnName("AccountID");
+            entity.Property(e => e.AccountType).HasColumnType("enum('admin','employer','student')");
+            entity.Property(e => e.Deleted).HasDefaultValueSql("'0'");
+            entity.Property(e => e.Password).HasMaxLength(20);
+            entity.Property(e => e.PhoneNumber).HasMaxLength(10);
+        });
+
         modelBuilder.Entity<Cv>(entity =>
         {
             entity.HasKey(e => e.Cvid).HasName("PRIMARY");
@@ -55,6 +72,7 @@ public partial class JobiverseContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'")
                 .HasColumnType("datetime(3)");
+            entity.Property(e => e.Deleted).HasDefaultValueSql("'0'");
             entity.Property(e => e.StudentId).HasColumnName("StudentID");
             entity.Property(e => e.Title).HasMaxLength(100);
 
@@ -75,6 +93,7 @@ public partial class JobiverseContext : DbContext
                 .HasDefaultValueSql("'uuid()'")
                 .HasColumnName("FileID");
             entity.Property(e => e.Cvid).HasColumnName("CVID");
+            entity.Property(e => e.Deleted).HasDefaultValueSql("'0'");
             entity.Property(e => e.FileName).HasMaxLength(255);
             entity.Property(e => e.FileUrl)
                 .HasMaxLength(255)
@@ -97,6 +116,7 @@ public partial class JobiverseContext : DbContext
             entity.Property(e => e.DisciplineId)
                 .HasDefaultValueSql("'uuid()'")
                 .HasColumnName("DisciplineID");
+            entity.Property(e => e.Deleted).HasDefaultValueSql("'0'");
             entity.Property(e => e.DisciplineName).HasMaxLength(255);
             entity.Property(e => e.MajorId).HasColumnName("MajorID");
 
@@ -117,14 +137,13 @@ public partial class JobiverseContext : DbContext
                 .HasColumnName("EmployerID");
             entity.Property(e => e.AccountId).HasColumnName("AccountID");
             entity.Property(e => e.AddressEmployers).HasMaxLength(255);
-            entity.Property(e => e.BusinessScale).HasMaxLength(255);
+            entity.Property(e => e.BusinessScale).HasColumnType("enum('Private individuals','companies')");
             entity.Property(e => e.CompanyInfo).HasMaxLength(100);
             entity.Property(e => e.CompanyName).HasMaxLength(100);
+            entity.Property(e => e.Deleted).HasDefaultValueSql("'0'");
             entity.Property(e => e.Industry).HasMaxLength(100);
             entity.Property(e => e.Job).HasMaxLength(100);
-            entity.Property(e => e.Prove)
-                .HasMaxLength(100)
-                .HasColumnName("prove");
+            entity.Property(e => e.Prove).HasMaxLength(100);
             entity.Property(e => e.RepresentativeName).HasMaxLength(100);
 
             entity.HasOne(d => d.Account).WithOne(p => p.Employer)
@@ -139,6 +158,7 @@ public partial class JobiverseContext : DbContext
             entity.Property(e => e.MajorId)
                 .HasDefaultValueSql("'uuid()'")
                 .HasColumnName("MajorID");
+            entity.Property(e => e.Deleted).HasDefaultValueSql("'0'");
             entity.Property(e => e.MajorName).HasMaxLength(255);
         });
 
@@ -146,19 +166,20 @@ public partial class JobiverseContext : DbContext
         {
             entity.HasKey(e => e.NotificationId).HasName("PRIMARY");
 
-            entity.HasIndex(e => e.UserId, "UserID");
+            entity.HasIndex(e => e.AccountId, "AccountID");
 
             entity.Property(e => e.NotificationId)
                 .HasDefaultValueSql("'uuid()'")
                 .HasColumnName("NotificationID");
+            entity.Property(e => e.AccountId).HasColumnName("AccountID");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'")
                 .HasColumnType("datetime(3)");
+            entity.Property(e => e.Deleted).HasDefaultValueSql("'0'");
             entity.Property(e => e.IsRead).HasDefaultValueSql("'0'");
-            entity.Property(e => e.UserId).HasColumnName("UserID");
 
-            entity.HasOne(d => d.User).WithMany(p => p.Notifications)
-                .HasForeignKey(d => d.UserId)
+            entity.HasOne(d => d.Account).WithMany(p => p.Notifications)
+                .HasForeignKey(d => d.AccountId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Notifications_ibfk_1");
         });
@@ -178,10 +199,11 @@ public partial class JobiverseContext : DbContext
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'")
                 .HasColumnType("datetime(3)");
+            entity.Property(e => e.Deleted).HasDefaultValueSql("'0'");
             entity.Property(e => e.MajorId).HasColumnName("MajorID");
             entity.Property(e => e.Status)
-                .HasMaxLength(20)
-                .HasDefaultValueSql("'open'");
+                .HasDefaultValueSql("'open'")
+                .HasColumnType("enum('open','closed','archived')");
             entity.Property(e => e.Title).HasMaxLength(255);
             entity.Property(e => e.WorkingTime).HasMaxLength(100);
 
@@ -210,6 +232,7 @@ public partial class JobiverseContext : DbContext
             entity.Property(e => e.AvatarUrl)
                 .HasMaxLength(255)
                 .HasColumnName("AvatarURL");
+            entity.Property(e => e.Deleted).HasDefaultValueSql("'0'");
             entity.Property(e => e.MajorId).HasColumnName("MajorID");
             entity.Property(e => e.Mssv)
                 .HasMaxLength(20)
@@ -243,10 +266,11 @@ public partial class JobiverseContext : DbContext
             entity.Property(e => e.AppliedAt)
                 .HasDefaultValueSql("'CURRENT_TIMESTAMP(3)'")
                 .HasColumnType("datetime(3)");
+            entity.Property(e => e.Deleted).HasDefaultValueSql("'0'");
             entity.Property(e => e.ProjectId).HasColumnName("ProjectID");
             entity.Property(e => e.Status)
-                .HasMaxLength(20)
-                .HasDefaultValueSql("'pending'");
+                .HasDefaultValueSql("'pending'")
+                .HasColumnType("enum('pending','accepted','rejected')");
             entity.Property(e => e.StudentId).HasColumnName("StudentID");
 
             entity.HasOne(d => d.Project).WithMany(p => p.StudentApplies)
@@ -256,22 +280,6 @@ public partial class JobiverseContext : DbContext
             entity.HasOne(d => d.Student).WithMany(p => p.StudentApplies)
                 .HasForeignKey(d => d.StudentId)
                 .HasConstraintName("StudentApply_ibfk_1");
-        });
-
-        modelBuilder.Entity<Accounts>(entity =>
-        {
-            entity.HasKey(e => e.AccountId).HasName("PRIMARY");
-
-            entity.HasIndex(e => e.Email, "Email").IsUnique();
-
-            entity.HasIndex(e => e.PhoneNumber, "PhoneNumber").IsUnique();
-
-            entity.Property(e => e.AccountId)
-                .HasDefaultValueSql("'uuid()'")
-                .HasColumnName("AccountID");
-            entity.Property(e => e.AccountType).HasMaxLength(20);
-            entity.Property(e => e.Password).HasMaxLength(20);
-            entity.Property(e => e.PhoneNumber).HasMaxLength(10);
         });
 
         OnModelCreatingPartial(modelBuilder);

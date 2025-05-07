@@ -23,6 +23,8 @@ public partial class Cv
 
     public DateTime? CreatedAt { get; set; }
 
+    public bool? Deleted { get; set; }
+
     public virtual ICollection<CvFile> CvFiles { get; set; } = new List<CvFile>();
 
     public virtual Student Student { get; set; } = null!;

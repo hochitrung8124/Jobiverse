@@ -7,7 +7,7 @@ public partial class Notification
 {
     public string NotificationId { get; set; } = null!;
 
-    public string UserId { get; set; } = null!;
+    public string AccountId { get; set; } = null!;
 
     public string? Content { get; set; }
 
@@ -15,5 +15,7 @@ public partial class Notification
 
     public DateTime? CreatedAt { get; set; }
 
-    public virtual Accounts User { get; set; } = null!;
+    public bool? Deleted { get; set; }
+
+    public virtual Account Account { get; set; } = null!;
 }

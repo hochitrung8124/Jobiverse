@@ -23,7 +23,9 @@ public partial class Project
 
     public DateTime? CreatedAt { get; set; }
 
-    public virtual Accounts Account { get; set; } = null!;
+    public bool? Deleted { get; set; }
+
+    public virtual Account Account { get; set; } = null!;
 
     public virtual Major? Major { get; set; }
 
