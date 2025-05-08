@@ -1,6 +1,8 @@
 ﻿using API.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace API.Controllers
 {
@@ -45,27 +47,59 @@ namespace API.Controllers
 
         //Get/api/student/by-name
         // select student by MSSV/ student, employer
-        [HttpGet("by-name")]
-        public IActionResult GetStudentByMSSV(string mssv)
+
+
+[HttpGet("student/{mssv}")]
+    public async Task<IActionResult> GetStudentByMSSV(string mssv)
+    {
+        try
         {
-            try
-            {
-                //var student = _jobiverseContext.Students.SingleOrDefault(st => st.Mssv.Equals(mssv));
-                var student = _jobiverseContext.Students
+            var student = await _jobiverseContext.Students
                 .Where(st => st.Mssv == mssv)
                 .Select(st => new {
                     st.Mssv,
                     st.Name,
                     st.Major.MajorName,
                     st.AvatarUrl,
-                    st.University,                
+                    st.University,
                 })
-                .SingleOrDefault();
-                if (student == null)
+                .SingleOrDefaultAsync();
+
+            if (student == null)
+            {
+                return BadRequest("Name is not null");
+            }
+
+            return Ok(student);
+        }
+        catch
+        {
+            return BadRequest();
+        }
+    }
+
+
+
+    [HttpPost("{studentId}")]
+        public async Task<IActionResult> AddInfor(string studentId, Student student)
+        {
+            try
+            {
+                var checkId = await _jobiverseContext.Students.SingleOrDefaultAsync(tt => tt.StudentId.Equals(studentId));
+                if (checkId == null)
                 {
-                    return BadRequest("Name is not null");
+                    return BadRequest();
                 }
-                return Ok(student);
+                var _student = new Student
+                {
+                    Mssv = student.Mssv,
+                    Name = student.Name,
+                    University = student.University,
+                    AvatarUrl = student.AvatarUrl,
+                    MajorId = student.MajorId, // nhap vao ten chuyển thành id
+                };
+                _jobiverseContext.SaveChanges();
+                return Ok();
             }
             catch
             {
@@ -73,13 +107,12 @@ namespace API.Controllers
             }
         }
 
-
-        [HttpPost("{studentId}")]
-        public IActionResult AddInfor(string studentId, Student student)
+        [HttpPut("{studentId}")]
+        public async Task<IActionResult> UpdateInfor(string studentId,[FromBody] Student student)
         {
             try
             {
-                var checkId = _jobiverseContext.Students.SingleOrDefault(tt => tt.StudentId.Equals(studentId));
+                var checkId = await _jobiverseContext.Students.SingleOrDefaultAsync(tt => tt.StudentId.Equals(studentId));
                 if (checkId == null)
                 {
                     return BadRequest();
