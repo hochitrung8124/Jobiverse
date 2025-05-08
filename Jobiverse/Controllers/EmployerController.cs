@@ -39,7 +39,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpPost("{employerId}")]
+        [HttpPost("employer/{employerId}")]
         public IActionResult AddInfor(string employerId, Employer employer)
         {
             try
@@ -69,7 +69,7 @@ namespace API.Controllers
             }
         }
 
-        [HttpPost("{employerId}")]
+        [HttpPost("employer/update/{employerId}")]
         public IActionResult UpdateInfor(string employerId, Employer employer)
         {
             try
