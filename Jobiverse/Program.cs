@@ -1,6 +1,8 @@
 ﻿
 using System.Text;
+using API.Middlewares;
 using API.Models;
+using API.Sevices;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -10,6 +12,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
+builder.Services.AddSingleton<JwtService>();
 
 builder.Services.AddDbContext<JobiverseContext>(options =>
     options.UseMySQL(builder.Configuration.GetConnectionString("AivenConnection") ?? "")
@@ -46,10 +49,10 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(); // mặc định là /swagger/index.html
+    app.UseSwaggerUI();
 }
 
-// Configure the HTTP request pipeline.
+app.UseMiddleware<JwtMiddleware>();
 
 app.UseHttpsRedirection();
 
