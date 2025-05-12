@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace API.DTOs;
 
-public class AccRegisterDto
+public class RegisterDto
 {
   public string Email { get; set; } = string.Empty;
   public string PhoneNumber { get; set; } = string.Empty;

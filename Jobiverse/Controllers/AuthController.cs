@@ -1,10 +1,14 @@
 using API.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using API.DTOs;
-using API.Sevices;
 using System.Security.Claims;
+using API.Settings;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
@@ -12,18 +16,16 @@ namespace API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly JobiverseContext _context;
-        private readonly IConfiguration _config;
-        private readonly JwtService _jwtService;
+        private readonly JwtSettings _jwtSettings;
 
-        public AuthController(JobiverseContext jobiverseContext, IConfiguration config)
+        public AuthController(JobiverseContext jobiverseContext, IOptions<JwtSettings> jwtOptions)
         {
-            _config = config;
             _context = jobiverseContext;
-            _jwtService = new JwtService(config);
+            _jwtSettings = jwtOptions.Value;
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(AccRegisterDto req)
+        public async Task<IActionResult> Register(RegisterDto req)
         {
             var email = req.Email.Trim();
             var phone = req.PhoneNumber.Trim();
@@ -70,25 +72,41 @@ namespace API.Controllers
             bool isPasswordValid = BCrypt.Net.BCrypt.Verify(req.Password, account.Password);
             if (!isPasswordValid) return Unauthorized(new { message = "Invalid password" });
 
-            var token = _jwtService.GenerateToken(account);
-            Response.Cookies.Append("jwt", token, new CookieOptions
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, account.Email),
+                new Claim(ClaimTypes.NameIdentifier, account.AccountId ?? string.Empty),
+                new Claim(ClaimTypes.Role, account.AccountType.ToString()),
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var token = new JwtSecurityToken(
+                issuer: _jwtSettings.Issuer,
+                audience: _jwtSettings.Audience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiresInMinutes),
+                signingCredentials: creds);
+
+            var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+            Response.Cookies.Append("jwt", jwt, new CookieOptions
             {
                 HttpOnly = true,
-                Secure = false,
-                SameSite = SameSiteMode.None,
-                Expires = DateTime.UtcNow.AddDays(7),
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddMinutes(_jwtSettings.ExpiresInMinutes)
             });
 
             return Ok(new { token = "Login successfully" });
         }
 
-        [HttpGet("me")]
-        public IActionResult Me()
+        [HttpPost("logout")]
+        public IActionResult Logout()
         {
-            var accountName = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
-            var accountId = User?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            if (accountName == null) return Unauthorized();
-            return Ok(new { accountName, accountId });
+            Response.Cookies.Delete("jwt");
+            return Ok(new { message = "Logout successfully" });
         }
     }
 }
